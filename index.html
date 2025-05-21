@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUYHUT store - Shop Fashion, Electronics & More</title>
+    <meta name="description" content="BUYHUT store - Your one-stop shop for fashion, electronics, accessories and more at the best prices. Shop now!">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="error.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header>
+        <div class="logo">
+            <a href="index.html">
+                <span class="buy">Buy</span><span class="hut">Hut</span>
+                <span class="store">store</span>
+            </a>
+        </div>
+        <div class="menu-icon" id="menuIcon">
+            <i class="fas fa-ellipsis-v"></i>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search products or categories...">
+        </div>
+        <div class="disclaimer-container">
+            <div class="disclaimer-ticker">
+                Disclaimer: All products are affiliate-linked. We do not own any product shown here. Prices may vary.
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Navigation -->
+    <div class="category-nav">
+        <div class="category-chip active" data-category="all">All</div>
+        <div class="category-chip" data-category="clothing">Clothing</div>
+        <div class="category-chip" data-category="footwear">Footwear</div>
+        <div class="category-chip" data-category="accessories">Accessories</div>
+        <div class="category-chip" data-category="electronics">Electronics</div>
+        <div class="category-chip" data-category="home">Home</div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-container" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p>Loading products...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-container" id="productsContainer">
+        <!-- Products will be dynamically loaded here -->
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-body">
+                <!-- Product details will be dynamically loaded here -->
+            </div>
+            <div class="related-products">
+                <h3>Related Products</h3>
+                <div class="related-products-container">
+                    <!-- Related products will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Sheet Menu -->
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="bottom-sheet-content">
+            <div class="bottom-sheet-header">
+                <h3>Menu</h3>
+                <span class="close-sheet">&times;</span>
+            </div>
+            <div class="bottom-sheet-items">
+                <div class="menu-item" data-page="about">About Us</div>
+                <div class="menu-item" data-page="terms">Terms & Conditions</div>
+                <div class="menu-item" data-page="privacy">Privacy Policy</div>
+                <div class="menu-item" data-page="contact">Contact Us</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Chat Icon -->
+    <a href="https://wa.me/1234567890" class="whatsapp-icon" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Toast Message -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <i class="fas fa-info-circle"></i>
+            <span id="toastMessage">You're being redirected to the official store.</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+          </html>
+  
