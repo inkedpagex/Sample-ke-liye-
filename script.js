@@ -295,8 +295,7 @@ function openProductModal(product) {
         <div class="modal-product-name">${product.name}</div>
         <div class="modal-product-price">₹${product.priceMin} ~ ₹${product.priceMax}</div>
         <div class="modal-product-description">${product.description}</div>
-        <a href="${product.buyLink}" class="modal-buy-button" target="_blank">Buy on ${product.buyOn}</a>
-    `;
+        <a href="${product.buyLink}" class="buy-button" target="_blank" rel="noopener noreferrer">Buy on ${product.buyOn}</a>
     
     // Find related products (same category)
     const relatedProducts = allProducts.filter(p => 
