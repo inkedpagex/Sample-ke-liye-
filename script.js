@@ -333,34 +333,6 @@ function openProductModal(product) {
     // Show the modal
     productModal.style.display = 'block';
     document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
-}
-
-// Share product function
-function shareProduct(product) {
-    // Create a shareable URL with the product code
-    const shareUrl = `${window.location.origin}${window.location.pathname}?product${product.productCode}`;
-    
-    // Check if Web Share API is available
-    if (navigator.share) {
-        navigator.share({
-            title: `${product.name} - BUYHUT store`,
-            text: `Check out this ${product.name} on BUYHUT store! Price: ₹${product.priceMin} ~ ₹${product.priceMax}`,
-            url: shareUrl
-        })
-        .then(() => {
-            showToast('Product shared successfully!');
-        })
-        .catch(error => {
-            console.error('Error sharing:', error);
-            // Fallback for sharing
-            copyToClipboard(shareUrl);
-        });
-    } else {
-        // Fallback for browsers that don't support Web Share API
-        copyToClipboard(shareUrl);
-    }
-}
-
 // Copy text to clipboard
 function copyToClipboard(text) {
     // Create a temporary input element
@@ -378,10 +350,12 @@ function copyToClipboard(text) {
     document.body.removeChild(input);
     
     // Show toast message
+    showToast('Link copied to clipboard!');
+}
+    
+// Show toast message
 showToast('Link copied to clipboard!');
 
-} else {
-    // Fallback for browsers that don't support Web Share API
     // Copy link to clipboard
     navigator.clipboard.writeText(product.buyLink)
         .then(() => {
@@ -392,8 +366,6 @@ showToast('Link copied to clipboard!');
             showToast('Could not copy link. Try again later.');
         });
 }
-
-
 // Show toast message
 function showToast(message) {
     toast.textContent = message;
@@ -522,7 +494,7 @@ function setupEventListeners() {
         document.body.style.overflow = 'auto'; // Re-enable scrolling
     });
     
-        // Close modal when clicking outside
+    // Close modal when clicking outside
     productModal.addEventListener('click', (e) => {
         if (e.target === productModal) {
             productModal.style.display = 'none';
@@ -550,7 +522,6 @@ function setupEventListeners() {
             bottomSheet.style.display = 'none';
         }
     });
-}
 
 // Navigate to info page
 function navigateToInfoPage(section) {
