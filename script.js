@@ -8,6 +8,7 @@ let isLoading = true;
 const productsContainer = document.getElementById('productsContainer');
 const loadingSpinner = document.getElementById('loadingSpinner');
 const searchInput = document.getElementById('searchInput');
+const searchSuggestions = document.getElementById('searchSuggestions');
 const categoryChips = document.querySelectorAll('.category-chip');
 const menuIcon = document.getElementById('menuIcon');
 const bottomSheet = document.getElementById('bottomSheet');
@@ -295,12 +296,13 @@ function openProductModal(product) {
         <div class="modal-product-name">${product.name}</div>
         <div class="modal-product-price">₹${product.priceMin} ~ ₹${product.priceMax}</div>
         <div class="modal-product-description">${product.description}</div>
-        <a href="${product.buyLink}" class="buy-button" target="_blank" rel="noopener noreferrer">Buy on ${product.buyOn}</a>
+        <a href="${product.buyLink}" class="modal-buy-button" target="_blank">Buy on ${product.buyOn}</a>
+    `;
     
     // Find related products (same category)
     const relatedProducts = allProducts.filter(p => 
         p.category === product.category && p.productCode !== product.productCode
-    ).slice(0, 6); // Limit to 6 related products
+    ).slice(0, 4); // Limit to 4 related products
     
     // Populate related products
     relatedProductsContainer.innerHTML = '';
@@ -316,7 +318,7 @@ function openProductModal(product) {
                 <img src="${relatedProduct.imageURL}" alt="${relatedProduct.name}" class="related-product-image" onerror="this.src='https://via.placeholder.com/150?text=Image+Not+Found'">
                 <div class="related-product-info">
                     <div class="related-product-name">${relatedProduct.name}</div>
-                    <div class="related-product-price">₹${relatedProduct.priceMin} ~ ₹${relatedProduct.priceMax}</div>
+                    <div class="related-product-price">₹${relatedProduct.priceMin}</div>
                 </div>
             `;
             
@@ -328,10 +330,6 @@ function openProductModal(product) {
         });
     }
     
-    // Add click event to modal buy button
-    const modalBuyButton = modalBody.querySelector('.modal-buy-button');
-    // No additional event listener needed, the href and target="_blank" will handle the direct link
-    
     // Show the modal
     productModal.style.display = 'block';
     document.body.style.overflow = 'hidden'; // Prevent scrolling behind modal
@@ -339,18 +337,54 @@ function openProductModal(product) {
 
 // Share product function
 function shareProduct(product) {
+    // Create a shareable URL with the product code
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product${product.productCode}`;
+    
     // Check if Web Share API is available
     if (navigator.share) {
         navigator.share({
-            title: product.name,
+            title: `${product.name} - BUYHUT store`,
             text: `Check out this ${product.name} on BUYHUT store! Price: ₹${product.priceMin} ~ ₹${product.priceMax}`,
-            url: product.buyLink
+            url: shareUrl
+        })
+        .then(() => {
+            showToast('Product shared successfully!');
         })
         .catch(error => {
             console.error('Error sharing:', error);
-            showToast('Could not share product. Try again later.');
+            // Fallback for sharing
+            copyToClipboard(shareUrl);
         });
     } else {
+        // Fallback for browsers that don't support Web Share API
+        copyToClipboard(shareUrl);
+    }
+}
+
+// Copy text to clipboard
+function copyToClipboard(text) {
+    // Create a temporary input element
+    const input = document.createElement('input');
+    input.style.position = 'fixed';
+    input.style.opacity = 0;
+    input.value = text;
+    document.body.appendChild(input);
+    
+    // Select and copy the text
+    input.select();
+    document.execCommand('copy');
+    
+    // Remove the temporary input
+    document.body.removeChild(input);
+    
+    // Show toast message
+    showToast('Link copied to clipboard!');
+}
+    
+    // Show toast message
+    showToast('Link copied to clipboard!');
+}
+     }  else {
         // Fallback for browsers that don't support Web Share API
         // Copy link to clipboard
         navigator.clipboard.writeText(product.buyLink)
@@ -366,8 +400,7 @@ function shareProduct(product) {
 
 // Show toast message
 function showToast(message) {
-    const toastMessage = document.getElementById('toastMessage');
-    toastMessage.textContent = message;
+    toast.textContent = message;
     toast.style.display = 'block';
     
     // Hide toast after 3 seconds
@@ -376,24 +409,84 @@ function showToast(message) {
     }, 3000);
 }
 
-// Setup event listeners
+// Show search suggestions based on query
+function showSearchSuggestions(query) {
+    query = query.toLowerCase();
+    
+    // Filter products that match the query in name or product code
+    const matchingProducts = allProducts.filter(product => 
+        product.name.toLowerCase().includes(query) || 
+        product.productCode.toLowerCase().includes(query)
+    ).slice(0, 5); // Limit to 5 suggestions
+    
+    if (matchingProducts.length === 0) {
+        hideSearchSuggestions();
+        return;
+    }
+    
+    // Clear previous suggestions
+    searchSuggestions.innerHTML = '';
+    
+    // Create suggestion items
+    matchingProducts.forEach(product => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.className = 'search-suggestion-item';
+        suggestionItem.innerHTML = `
+            <span class="suggestion-code">${product.productCode}</span>
+            <span class="suggestion-name">${product.name}</span>
+        `;
+        
+        // Add click event to fill search input and trigger search
+        suggestionItem.addEventListener('click', () => {
+            searchInput.value = product.productCode;
+            filterBySearch(product.productCode);
+            hideSearchSuggestions();
+        });
+        
+        searchSuggestions.appendChild(suggestionItem);
+    });
+    
+    // Show suggestions
+    searchSuggestions.style.display = 'block';
+}
+
+// Hide search suggestions
+function hideSearchSuggestions() {
+    searchSuggestions.style.display = 'none';
+}// Setup event listeners
 function setupEventListeners() {
-    // Category filter
+    // Category chips
     categoryChips.forEach(chip => {
         chip.addEventListener('click', () => {
-            // Update active class
+            // Remove active class from all chips
             categoryChips.forEach(c => c.classList.remove('active'));
+            // Add active class to clicked chip
             chip.classList.add('active');
-            
-            // Filter products
+            // Filter products by category
             filterByCategory(chip.dataset.category);
         });
     });
     
     // Search input
     searchInput.addEventListener('input', debounce(() => {
-        filterBySearch(searchInput.value);
+        const query = searchInput.value.trim();
+        
+        // Show/hide search suggestions
+        if (query.length > 0) {
+            showSearchSuggestions(query);
+        } else {
+            hideSearchSuggestions();
+        }
+        
+        filterBySearch(query);
     }, 300));
+    
+    // Close search suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-bar')) {
+            hideSearchSuggestions();
+        }
+    });
     
     // Menu icon
     menuIcon.addEventListener('click', () => {
@@ -433,16 +526,30 @@ function setupEventListeners() {
         document.body.style.overflow = 'auto'; // Re-enable scrolling
     });
     
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
+        // Close modal when clicking outside
+    productModal.addEventListener('click', (e) => {
         if (e.target === productModal) {
             productModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
         }
     });
     
-    // Close bottom sheet when clicking outside
-    window.addEventListener('click', (e) => {
+    // Check for product code in URL on page load
+    window.addEventListener('load', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productParam = Array.from(urlParams.keys()).find(key => key.startsWith('product'));
+        
+        if (productParam) {
+            const productCode = productParam.replace('product', '');
+            if (productCode) {
+                // Set search input value to product code
+                searchInput.value = productCode;
+                // Trigger search
+                filterBySearch(productCode);
+            }
+        }
+    });
+}ndow.addEventListener('click', (e) => {
         if (e.target === bottomSheet) {
             bottomSheet.style.display = 'none';
         }
@@ -461,6 +568,7 @@ function debounce(func, delay) {
         const context = this;
         const args = arguments;
         clearTimeout(timeout);
+        
         timeout = setTimeout(() => func.apply(context, args), delay);
     };
 }
