@@ -378,25 +378,21 @@ function copyToClipboard(text) {
     document.body.removeChild(input);
     
     // Show toast message
-    showToast('Link copied to clipboard!');
+showToast('Link copied to clipboard!');
+
+} else {
+    // Fallback for browsers that don't support Web Share API
+    // Copy link to clipboard
+    navigator.clipboard.writeText(product.buyLink)
+        .then(() => {
+            showToast('Product link copied to clipboard!');
+        })
+        .catch(err => {
+            console.error('Could not copy text: ', err);
+            showToast('Could not copy link. Try again later.');
+        });
 }
-    
-    // Show toast message
-    showToast('Link copied to clipboard!');
-}
-     }  else {
-        // Fallback for browsers that don't support Web Share API
-        // Copy link to clipboard
-        navigator.clipboard.writeText(product.buyLink)
-            .then(() => {
-                showToast('Product link copied to clipboard!');
-            })
-            .catch(err => {
-                console.error('Could not copy text: ', err);
-                showToast('Could not copy link. Try again later.');
-            });
-    }
-}
+
 
 // Show toast message
 function showToast(message) {
